@@ -14,13 +14,27 @@ export default function Cell(props: CellProps) {
 
   const [hovered, setHovered] = useState(false)
   const [inputSQL, setInputSQL] = useState('')
+  const [result, setResult] = useState(null)
 
   const executeSQL = () => {
     if (!inputSQL.trim()) {
       return
     }
 
-    console.log(inputSQL)
+    fetch('/api/exec', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sql: inputSQL }),
+    })
+      .then(res => res.json())
+      .then((data) => {
+        setResult(data)
+      })
+      .catch((error) => {
+        console.error('Error:', error)
+      })
   }
 
   return (
@@ -85,8 +99,10 @@ export default function Cell(props: CellProps) {
           height: '300px',
           mt: '10px',
           border: '1px solid #000',
+          overflow: 'scroll',
         }}
         >
+          {result ? JSON.stringify(result, null, 2) : null}
         </Box>
       </Box>
     </>
