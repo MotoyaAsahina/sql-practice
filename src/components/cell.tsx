@@ -1,26 +1,44 @@
 import { Delete } from '@mui/icons-material'
 import { Box, IconButton, TextField, Typography } from '@mui/material'
 import { Roboto_Mono } from 'next/font/google'
+import { useState } from 'react'
 
 const robotoMono = Roboto_Mono({ subsets: ['latin'] })
 
-export default function Cell() {
-  const howToSend = process.platform === 'win32' ? 'Ctrl + Enter' : 'Cmd + Enter'
+type CellProps = {
+  index: number
+}
+
+export default function Cell(props: CellProps) {
+  const howToExecute = process.platform === 'win32' ? 'Ctrl + Enter' : 'Cmd + Enter'
+
+  const [hovered, setHovered] = useState(false)
+  const [inputSQL, setInputSQL] = useState('')
+
+  const executeSQL = () => {
+    if (!inputSQL.trim()) {
+      return
+    }
+
+    console.log(inputSQL)
+  }
 
   return (
     <>
-      <Box sx={[
-        {
-          p: '10px',
-          border: '1px solid #fff',
-          borderRadius: '5px',
-        },
-        {
-          ':hover': {
-            border: '1px solid #000',
+      <Box
+        sx={[
+          {
+            p: '10px',
+            borderRadius: '5px',
           },
-        },
-      ]}
+          {
+            ':hover': {
+              bgcolor: '#f9f9f9',
+            },
+          },
+        ]}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
         <Box sx={{
           display: 'flex',
@@ -30,9 +48,15 @@ export default function Cell() {
         }}
         >
           <Typography>
-            [1]
+            [
+            {props.index}
+            ]
           </Typography>
-          <IconButton>
+          <IconButton
+            sx={{
+              visibility: hovered ? 'visible' : 'hidden',
+            }}
+          >
             <Delete />
           </IconButton>
         </Box>
@@ -42,11 +66,18 @@ export default function Cell() {
           minRows={3}
           size="small"
           fullWidth
-          helperText={`Press \`${howToSend}\` to execute the query.`}
+          helperText={`Press \`${howToExecute}\` to execute the query.`}
           inputProps={{
             style: {
               fontFamily: robotoMono.style.fontFamily,
             },
+          }}
+          value={inputSQL}
+          onChange={e => setInputSQL(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+              executeSQL()
+            }
           }}
         />
         <Box sx={{
