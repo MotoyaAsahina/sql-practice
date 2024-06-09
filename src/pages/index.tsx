@@ -55,15 +55,15 @@ export default function Home() {
     saveCellIDs(newIDs)
 
     setTimeout(() => {
+      const lastCell = cellDivs.current.get(newIDs[newIDs.length - 1])
+      const textField = lastCell?.querySelector('textarea')
+      textField?.focus()
+
       cellsListDiv.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'end',
         inline: 'nearest',
       })
-
-      const lastCell = cellDivs.current.get(newIDs[newIDs.length - 1])
-      const textField = lastCell?.querySelector('textarea')
-      textField?.focus()
     }, 0.001)
   }
 
