@@ -11,3 +11,7 @@ export const saveCellData = (id: string, cellData: CellData) => {
 export const saveCellIDs = (cellIDs: string[]) => {
   localStorage.setItem('cellIDs', JSON.stringify(cellIDs))
 }
+
+export const deleteCellData = (id: string) => {
+  localStorage.removeItem(`cell:${id}`)
+}

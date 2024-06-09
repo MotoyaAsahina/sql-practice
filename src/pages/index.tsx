@@ -1,10 +1,14 @@
 import { Add } from '@mui/icons-material'
 import { Box, IconButton, Typography } from '@mui/material'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { createContext, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 import Cell from '@/components/Cell'
-import { CellData, saveCellIDs } from '@/lib/local_save'
+import { CellData, deleteCellData, saveCellIDs } from '@/lib/local_save'
+
+export const CellContext = createContext<{ deleteCell: (index: number) => () => void }>({
+  deleteCell: () => () => {},
+})
 
 export default function Home() {
   const [cells, setCells] = useState<CellData[]>([])
@@ -41,9 +45,9 @@ export default function Home() {
 
   const addCell = () => {
     setCells(prev => [...prev, { sql: '', result: null, errorMessage: null }])
-    const newCellIDs = [...cellIDs, uuidv4()]
-    setCellIDs(newCellIDs)
-    saveCellIDs(newCellIDs)
+    const newIDs = [...cellIDs, uuidv4()]
+    setCellIDs(newIDs)
+    saveCellIDs(newIDs)
 
     setTimeout(() => {
       cellsListDiv.current?.scrollIntoView({
@@ -52,6 +56,16 @@ export default function Home() {
         inline: 'nearest',
       })
     }, 0.001)
+  }
+
+  const deleteCell = (index: number) => () => {
+    const id = cellIDs[index]
+    const newIDs = cellIDs.filter((_, i) => i !== index)
+    const newCells = cells.filter((_, i) => i !== index)
+    setCellIDs(newIDs)
+    setCells(newCells)
+    saveCellIDs(newIDs)
+    deleteCellData(id)
   }
 
   return (
@@ -83,16 +97,18 @@ export default function Home() {
             gap: '14px',
           }}
           >
-            {
-              cells.map((cell, i) => (
-                <Cell
-                  key={i}
-                  id={cellIDs[i]}
-                  index={i + 1}
-                  defaultCellData={cell}
-                />
-              ))
-            }
+            <CellContext.Provider value={{ deleteCell }}>
+              {
+                cells.map((cell, i) => (
+                  <Cell
+                    key={i}
+                    id={cellIDs[i]}
+                    index={i + 1}
+                    defaultCellData={cell}
+                  />
+                ))
+              }
+            </CellContext.Provider>
           </Box>
           <Box sx={[
             {

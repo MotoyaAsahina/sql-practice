@@ -1,9 +1,10 @@
 import { Delete, ErrorOutline } from '@mui/icons-material'
 import { Box, IconButton, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import { Roboto_Mono } from 'next/font/google'
-import { useMemo, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 
 import { CellData, saveCellData } from '@/lib/local_save'
+import { CellContext } from '@/pages'
 
 const robotoMono = Roboto_Mono({ subsets: ['latin'] })
 
@@ -21,8 +22,7 @@ export default function Cell(props: CellProps) {
   const [result, setResult] = useState<{ fields: string[], data: object[] } | null>(props.defaultCellData.result)
   const [errMessage, setErrMessage] = useState<string | null>(props.defaultCellData.errorMessage)
 
-  const deleteCell = () => {
-  }
+  const { deleteCell } = useContext(CellContext)
 
   const executeSQL = () => {
     if (!inputSQL.trim()) {
@@ -123,7 +123,7 @@ export default function Cell(props: CellProps) {
             sx={{
               visibility: hovered ? 'visible' : 'hidden',
             }}
-            onClick={deleteCell}
+            onClick={deleteCell(props.index - 1)}
           >
             <Delete />
           </IconButton>
