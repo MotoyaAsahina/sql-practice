@@ -42,6 +42,7 @@ export default function Home() {
   }, [])
 
   const cellsListDiv = useRef<HTMLDivElement | null>(null)
+  const cellDivs = useRef<Map<string, HTMLDivElement | null>>(new Map())
 
   const addCell = () => {
     setCells(prev => [...prev, { sql: '', result: null, errorMessage: null }])
@@ -55,6 +56,10 @@ export default function Home() {
         block: 'end',
         inline: 'nearest',
       })
+
+      const lastCell = cellDivs.current.get(newIDs[newIDs.length - 1])
+      const textField = lastCell?.querySelector('textarea')
+      textField?.focus()
     }, 0.001)
   }
 
@@ -100,12 +105,18 @@ export default function Home() {
             <CellContext.Provider value={{ deleteCell }}>
               {
                 cells.map((cell, i) => (
-                  <Cell
+                  <Box
                     key={i}
-                    id={cellIDs[i]}
-                    index={i + 1}
-                    defaultCellData={cell}
-                  />
+                    ref={(node: HTMLDivElement) => {
+                      cellDivs.current.set(cellIDs[i], node)
+                    }}
+                  >
+                    <Cell
+                      id={cellIDs[i]}
+                      index={i + 1}
+                      defaultCellData={cell}
+                    />
+                  </Box>
                 ))
               }
             </CellContext.Provider>
