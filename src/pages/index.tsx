@@ -3,7 +3,7 @@ import { Box, IconButton, Typography } from '@mui/material'
 import React, { createContext, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
-import Cell from '@/components/Cell'
+import Cell from '@/components/cell'
 import { CellData, deleteCellData, saveCellData, saveCellIDs } from '@/lib/local_save'
 
 export const CellContext = createContext<{
@@ -111,7 +111,7 @@ export default function Home() {
           <Box sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px',
+            gap: '18px',
           }}
           >
             <CellContext.Provider value={{ updateCell, deleteCell }}>
@@ -137,7 +137,7 @@ export default function Home() {
             {
               display: 'flex',
               alignItems: 'center',
-              mt: '20px',
+              mt: '18px',
               px: '10px',
               py: '4px',
               gap: '10px',

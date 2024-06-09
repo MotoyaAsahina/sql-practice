@@ -95,12 +95,14 @@ export default function Cell(props: CellProps) {
       <Box
         sx={[
           {
-            p: '10px',
+            px: '20px',
+            py: '10px',
             borderRadius: '5px',
+            border: '1px solid #e0e0e0',
           },
           {
             ':hover': {
-              bgcolor: '#f9f9f9',
+              bgcolor: '#fbfbfb',
             },
           },
         ]}
@@ -114,12 +116,10 @@ export default function Cell(props: CellProps) {
           mb: '4px',
         }}
         >
-          <Typography>
+          <Typography color="rgba(0, 0, 0, 0.87)">
             [
             {props.index + 1}
-            ] (
-            {props.id}
-            )
+            ]
           </Typography>
           <IconButton
             sx={{
@@ -137,6 +137,9 @@ export default function Cell(props: CellProps) {
           size="small"
           fullWidth
           helperText={`Press \`${howToExecute}\` to execute the query.`}
+          sx={{ '& .MuiOutlinedInput-root': {
+            bgcolor: '#fff',
+          } }}
           inputProps={{
             style: {
               fontFamily: robotoMono.style.fontFamily,
@@ -173,9 +176,8 @@ export default function Cell(props: CellProps) {
         </Box>
         <TableContainer sx={{
           width: '100%',
-          maxHeight: '400px',
+          maxHeight: '402px',
           mt: '14px',
-          // border: '1px solid #e0e0e0',
           display: result && result.data.length && !errMessage ? 'block' : 'none',
         }}
         >
