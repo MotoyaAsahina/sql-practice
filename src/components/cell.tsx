@@ -44,20 +44,28 @@ export default function Cell(props: CellProps) {
   }
 
   const [tableHeader, tableBody] = useMemo(() => {
+    if (!result || !result.data.length) {
+      return [null, null]
+    }
+
     return [
-      result && result.fields.map((field: string) => (
-        <TableCell
-          key={field}
-          align="left"
-          sx={{
-            width: 'auto',
-            maxWidth: '100px',
-          }}
-        >
-          {field}
-        </TableCell>
-      )),
-      result && result.data.map((row: object, i: number) => (
+      (
+        <TableRow key="header">
+          {result.fields.map((field: string) => (
+            <TableCell
+              key={field}
+              align="left"
+              sx={{
+                width: 'auto',
+                maxWidth: '100px',
+              }}
+            >
+              {field}
+            </TableCell>
+          ))}
+        </TableRow>
+      ),
+      result.data.map((row: object, i: number) => (
         <TableRow key={i}>
           {Object.values(row).map((value: string, j: number) => (
             <TableCell key={j}>
@@ -152,7 +160,7 @@ export default function Cell(props: CellProps) {
           maxHeight: '500px',
           mt: '14px',
           // border: '1px solid #e0e0e0',
-          display: result && !errMessage ? 'block' : 'none',
+          display: result && result.data.length && !errMessage ? 'block' : 'none',
         }}
         >
           <Table
@@ -163,9 +171,7 @@ export default function Cell(props: CellProps) {
             }}
           >
             <TableHead>
-              <TableRow>
-                {tableHeader}
-              </TableRow>
+              {tableHeader}
             </TableHead>
             <TableBody>
               {tableBody}

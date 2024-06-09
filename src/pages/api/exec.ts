@@ -14,8 +14,8 @@ export default function handler(
 
   conn.query<RowDataPacket[]>(req.body.sql, (err, rows) => {
     if (err) {
-      res.status(200).json({ errorMessage: err.message })
+      return res.status(200).json({ errorMessage: err.message })
     }
-    res.status(200).json({ fields: Object.keys(rows[0] ?? []), data: rows })
+    return res.status(200).json({ fields: Object.keys(rows[0] ?? []), data: rows })
   })
 }
