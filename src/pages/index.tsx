@@ -1,19 +1,52 @@
 import { Add } from '@mui/icons-material'
 import { Box, IconButton, Typography } from '@mui/material'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 import Cell from '@/components/Cell'
+import { CellData, saveCellIDs } from '@/lib/local_save'
 
 export default function Home() {
-  const [cellLen, setCellLen] = useState(1)
+  const [cells, setCells] = useState<CellData[]>([])
+  const [cellIDs, setCellIDs] = useState<string[]>([])
 
-  const cellsList = useRef<null | HTMLDivElement>(null)
+  // Load saved cells from localStorage
+  useEffect(() => {
+    const saveDCellIDsStr = localStorage.getItem('cellIDs')
+    if (!saveDCellIDsStr || !JSON.parse(saveDCellIDsStr).length) {
+      setCells([{ sql: '', result: null, errorMessage: null }])
+      const newID = [uuidv4()]
+      setCellIDs(newID)
+      saveCellIDs(newID)
+      return
+    }
+
+    const savedCellIDs = JSON.parse(saveDCellIDsStr)
+    setCellIDs(savedCellIDs)
+
+    const newCells: CellData[] = []
+    savedCellIDs.forEach((id: string) => {
+      const savedCell = localStorage.getItem(`cell:${id}`)
+      if (savedCell) {
+        newCells.push(JSON.parse(savedCell))
+      }
+      else {
+        newCells.push({ sql: '', result: null, errorMessage: null })
+      }
+    })
+    setCells(newCells)
+  }, [])
+
+  const cellsListDiv = useRef<HTMLDivElement | null>(null)
 
   const addCell = () => {
-    setCellLen(cellLen + 1)
+    setCells(prev => [...prev, { sql: '', result: null, errorMessage: null }])
+    const newCellIDs = [...cellIDs, uuidv4()]
+    setCellIDs(newCellIDs)
+    saveCellIDs(newCellIDs)
 
     setTimeout(() => {
-      cellsList.current?.scrollIntoView({
+      cellsListDiv.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'end',
         inline: 'nearest',
@@ -41,7 +74,7 @@ export default function Home() {
             },
           ]}
           ref={(node: HTMLDivElement) => {
-            cellsList.current = node
+            cellsListDiv.current = node
           }}
         >
           <Box sx={{
@@ -51,8 +84,13 @@ export default function Home() {
           }}
           >
             {
-              Array(cellLen).fill(0).map((_, i) => (
-                <Cell key={i} index={i + 1} />
+              cells.map((cell, i) => (
+                <Cell
+                  key={i}
+                  id={cellIDs[i]}
+                  index={i + 1}
+                  defaultCellData={cell}
+                />
               ))
             }
           </Box>

@@ -3,19 +3,26 @@ import { Box, IconButton, Table, TableBody, TableCell, TableContainer, TableFoot
 import { Roboto_Mono } from 'next/font/google'
 import { useMemo, useState } from 'react'
 
+import { CellData, saveCellData } from '@/lib/local_save'
+
 const robotoMono = Roboto_Mono({ subsets: ['latin'] })
 
 type CellProps = {
   index: number
+  id: string
+  defaultCellData: CellData
 }
 
 export default function Cell(props: CellProps) {
   const howToExecute = process.platform === 'win32' ? 'Ctrl + Enter' : 'Cmd + Enter'
 
   const [hovered, setHovered] = useState(false)
-  const [inputSQL, setInputSQL] = useState('')
-  const [result, setResult] = useState<{ fields: string[], data: object[] } | null>(null)
-  const [errMessage, setErrMessage] = useState<string | null>('')
+  const [inputSQL, setInputSQL] = useState(props.defaultCellData.sql)
+  const [result, setResult] = useState<{ fields: string[], data: object[] } | null>(props.defaultCellData.result)
+  const [errMessage, setErrMessage] = useState<string | null>(props.defaultCellData.errorMessage)
+
+  const deleteCell = () => {
+  }
 
   const executeSQL = () => {
     if (!inputSQL.trim()) {
@@ -33,13 +40,17 @@ export default function Cell(props: CellProps) {
       .then((data) => {
         if (data.errorMessage) {
           setErrMessage(data.errorMessage)
+          saveCellData(props.id, { sql: inputSQL, result: null, errorMessage: data.errorMessage })
           return
         }
         setResult(data)
         setErrMessage(null)
+        saveCellData(props.id, { sql: inputSQL, result: data, errorMessage: null })
       })
       .catch((error) => {
-        console.error('Error:', error)
+        const errMessage = `Failed to execute the query. error: ${error}`
+        setErrMessage(errMessage)
+        saveCellData(props.id, { sql: inputSQL, result: null, errorMessage: errMessage })
       })
   }
 
@@ -104,12 +115,15 @@ export default function Cell(props: CellProps) {
           <Typography>
             [
             {props.index}
-            ]
+            ] (
+            {props.id}
+            )
           </Typography>
           <IconButton
             sx={{
               visibility: hovered ? 'visible' : 'hidden',
             }}
+            onClick={deleteCell}
           >
             <Delete />
           </IconButton>
