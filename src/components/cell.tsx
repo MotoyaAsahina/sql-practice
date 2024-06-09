@@ -1,9 +1,9 @@
 import { Delete, ErrorOutline } from '@mui/icons-material'
 import { Box, IconButton, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import { Roboto_Mono } from 'next/font/google'
-import { useContext, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
 
-import { CellData, saveCellData } from '@/lib/local_save'
+import { CellData } from '@/lib/local_save'
 import { CellContext } from '@/pages'
 
 const robotoMono = Roboto_Mono({ subsets: ['latin'] })
@@ -22,7 +22,13 @@ export default function Cell(props: CellProps) {
   const [result, setResult] = useState<{ fields: string[], data: object[] } | null>(props.defaultCellData.result)
   const [errMessage, setErrMessage] = useState<string | null>(props.defaultCellData.errorMessage)
 
-  const { deleteCell } = useContext(CellContext)
+  const { updateCell, deleteCell } = useContext(CellContext)
+
+  useEffect(() => {
+    setInputSQL(props.defaultCellData.sql)
+    setResult(props.defaultCellData.result)
+    setErrMessage(props.defaultCellData.errorMessage)
+  }, [props])
 
   const executeSQL = () => {
     if (!inputSQL.trim()) {
@@ -39,18 +45,14 @@ export default function Cell(props: CellProps) {
       .then(res => res.json())
       .then((data) => {
         if (data.errorMessage) {
-          setErrMessage(data.errorMessage)
-          saveCellData(props.id, { sql: inputSQL, result: null, errorMessage: data.errorMessage })
+          updateCell(props.index, { sql: inputSQL, result: null, errorMessage: data.errorMessage })
           return
         }
-        setResult(data)
-        setErrMessage(null)
-        saveCellData(props.id, { sql: inputSQL, result: data, errorMessage: null })
+        updateCell(props.index, { sql: inputSQL, result: data, errorMessage: null })
       })
       .catch((error) => {
         const errMessage = `Failed to execute the query. error: ${error}`
-        setErrMessage(errMessage)
-        saveCellData(props.id, { sql: inputSQL, result: null, errorMessage: errMessage })
+        updateCell(props.index, { sql: inputSQL, result: null, errorMessage: errMessage })
       })
   }
 
@@ -114,7 +116,7 @@ export default function Cell(props: CellProps) {
         >
           <Typography>
             [
-            {props.index}
+            {props.index + 1}
             ] (
             {props.id}
             )
@@ -123,7 +125,7 @@ export default function Cell(props: CellProps) {
             sx={{
               visibility: hovered ? 'visible' : 'hidden',
             }}
-            onClick={deleteCell(props.index - 1)}
+            onClick={deleteCell(props.index)}
           >
             <Delete />
           </IconButton>
@@ -171,7 +173,7 @@ export default function Cell(props: CellProps) {
         </Box>
         <TableContainer sx={{
           width: '100%',
-          maxHeight: '500px',
+          maxHeight: '400px',
           mt: '14px',
           // border: '1px solid #e0e0e0',
           display: result && result.data.length && !errMessage ? 'block' : 'none',

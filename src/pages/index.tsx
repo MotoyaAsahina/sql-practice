@@ -4,11 +4,15 @@ import React, { createContext, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 import Cell from '@/components/Cell'
-import { CellData, deleteCellData, saveCellIDs } from '@/lib/local_save'
+import { CellData, deleteCellData, saveCellData, saveCellIDs } from '@/lib/local_save'
 
-export const CellContext = createContext<{ deleteCell: (index: number) => () => void }>({
-  deleteCell: () => () => {},
-})
+export const CellContext = createContext<{
+  updateCell: (index: number, cellData: CellData) => void
+  deleteCell: (index: number) => () => void
+}>({
+      updateCell: () => {},
+      deleteCell: () => () => {},
+    })
 
 export default function Home() {
   const [cells, setCells] = useState<CellData[]>([])
@@ -63,10 +67,18 @@ export default function Home() {
     }, 0.001)
   }
 
+  const updateCell = (index: number, cellData: CellData) => {
+    const id = cellIDs[index]
+    const newCells = cells.map((cell, i) => i === index ? cellData : cell)
+    setCells(newCells)
+    saveCellData(id, cellData)
+  }
+
   const deleteCell = (index: number) => () => {
     const id = cellIDs[index]
     const newIDs = cellIDs.filter((_, i) => i !== index)
     const newCells = cells.filter((_, i) => i !== index)
+
     setCellIDs(newIDs)
     setCells(newCells)
     saveCellIDs(newIDs)
@@ -102,7 +114,7 @@ export default function Home() {
             gap: '14px',
           }}
           >
-            <CellContext.Provider value={{ deleteCell }}>
+            <CellContext.Provider value={{ updateCell, deleteCell }}>
               {
                 cells.map((cell, i) => (
                   <Box
@@ -113,7 +125,7 @@ export default function Home() {
                   >
                     <Cell
                       id={cellIDs[i]}
-                      index={i + 1}
+                      index={i}
                       defaultCellData={cell}
                     />
                   </Box>
