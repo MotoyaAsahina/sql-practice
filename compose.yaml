@@ -1,0 +1,35 @@
+services:
+  app:
+    image: sql-practice:latest
+    restart: always
+    working_dir: /app
+    command: node server.js
+    expose:
+      - 80
+    networks:
+      default:
+      caddy:
+        aliases:
+          - sql-practice
+    environment:
+      - PORT=80
+      - MYSQL_HOST=mariadb
+      - MYSQL_USER=select_only
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=world
+
+  mariadb:
+    image: mariadb:11.4.2
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=xW6hwjjW57kcwSLAuZK9XmrCmNabQNFGww7s
+      - TZ=Asia/Tokyo
+    volumes:
+      - ./initdb.d:/docker-entrypoint-initdb.d
+
+networks:
+  default:
+    driver: bridge
+  caddy:
+    external: true
+    name: caddy_default

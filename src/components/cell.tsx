@@ -98,7 +98,6 @@ export default function Cell(props: CellProps) {
             px: '20px',
             py: '10px',
             borderRadius: '5px',
-            border: '1px solid #e0e0e0',
           },
           {
             ':hover': {
@@ -137,9 +136,11 @@ export default function Cell(props: CellProps) {
           size="small"
           fullWidth
           helperText={`Press \`${howToExecute}\` to execute the query.`}
-          sx={{ '& .MuiOutlinedInput-root': {
-            bgcolor: '#fff',
-          } }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              bgcolor: '#fff',
+            },
+          }}
           inputProps={{
             style: {
               fontFamily: robotoMono.style.fontFamily,

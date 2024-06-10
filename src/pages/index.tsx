@@ -78,7 +78,6 @@ export default function Home() {
     const id = cellIDs[index]
     const newIDs = cellIDs.filter((_, i) => i !== index)
     const newCells = cells.filter((_, i) => i !== index)
-
     setCellIDs(newIDs)
     setCells(newCells)
     saveCellIDs(newIDs)
