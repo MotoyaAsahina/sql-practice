@@ -25,7 +25,8 @@ export default function Cell(props: CellProps) {
   const { updateCell, deleteCell } = useContext(CellContext)
 
   useEffect(() => {
-    setInputSQL(props.defaultCellData.sql)
+    // Do not rollback the inputSQL when other cells are updated
+    // setInputSQL(props.defaultCellData.sql)
     setResult(props.defaultCellData.result)
     setErrMessage(props.defaultCellData.errorMessage)
   }, [props])
