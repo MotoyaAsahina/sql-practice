@@ -72,10 +72,6 @@ export default function Cell(props: CellProps) {
             <TableCell
               key={field}
               align="left"
-              sx={{
-                width: 'auto',
-                maxWidth: '100px',
-              }}
             >
               {field}
             </TableCell>
