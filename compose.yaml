@@ -4,13 +4,8 @@ services:
     restart: always
     working_dir: /app
     command: node server.js
-    expose:
-      - 80
-    networks:
-      default:
-      caddy:
-        aliases:
-          - sql-practice
+    ports:
+      - "127.0.0.1:8030:80"
     environment:
       - PORT=80
       - MYSQL_HOST=mariadb
@@ -26,10 +21,3 @@ services:
       - TZ=Asia/Tokyo
     volumes:
       - ./initdb.d:/docker-entrypoint-initdb.d
-
-networks:
-  default:
-    driver: bridge
-  caddy:
-    external: true
-    name: caddy_default
