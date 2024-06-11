@@ -1,0 +1,47 @@
+name: Deploy to server
+
+on: workflow_dispatch
+
+env:
+  SSH_URI: ${{ secrets.REMOTE_USERNAME }}@${{ secrets.REMOTE_HOSTNAME }}
+  REMOTE_HOST_PATH: /srv/sql-practice
+  PACKAGE_NAME: sql-practice:latest
+  UPLOAD_FILES: image.tar compose.yaml initdb.d
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Build Dockerfile
+        run: |
+          docker buildx build --platform linux/amd64 -t ${{ env.PACKAGE_NAME }} --output type=tar,dest=image.tar .
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Setup ssh config
+        run: |
+          echo "Host *" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "  UserKnownHostsFile /dev/null" >> ~/.ssh/config
+      - name: Create srv directory
+        run: >
+          ssh $SSH_URI "
+            [ ! -d $REMOTE_HOST_PATH ] && mkdir $REMOTE_HOST_PATH;
+            [ ! -d $REMOTE_HOST_PATH/initdb.d ] && mkdir $REMOTE_HOST_PATH/initdb.d;
+            true"
+      - name: Download world.sql
+        run: |
+          wget https://downloads.mysql.com/docs/world-db.zip
+          unzip world-db.zip
+          mv world-db/world.sql initdb.d/01_world.sql
+      - name: Upload files
+        run: |
+          scp -r ${{ env.UPLOAD_FILES }} $SSH_URI:$REMOTE_HOST_PATH
+      - name: Run app
+        run: |
+          ssh $SSH_URI \
+            "cd $REMOTE_HOST_PATH; docker import image.tar ${{ env.PACKAGE_NAME }} && docker compose up -d"
