@@ -15,7 +15,8 @@ type CellProps = {
 }
 
 export default function Cell(props: CellProps) {
-  const howToExecute = process.platform === 'win32' ? 'Ctrl + Enter' : 'Cmd + Enter'
+  const ua = window.navigator.userAgent.toLowerCase()
+  const howToExecute = ua.indexOf('windows nt') !== -1 ? 'Ctrl + Enter' : 'Cmd + Enter'
 
   const [hovered, setHovered] = useState(false)
   const [inputSQL, setInputSQL] = useState(props.defaultCellData.sql)
