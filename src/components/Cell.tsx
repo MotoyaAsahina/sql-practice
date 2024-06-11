@@ -184,7 +184,7 @@ export default function Cell(props: CellProps) {
           width: '100%',
           maxHeight: '402px',
           mt: '14px',
-          display: result && result.data.length && !errMessage ? 'block' : 'none',
+          display: result && !errMessage ? 'block' : 'none',
         }}
         >
           <Table
