@@ -19,6 +19,7 @@ export default function Cell(props: CellProps) {
   const howToExecute = ua.indexOf('windows nt') !== -1 ? 'Ctrl + Enter' : 'Cmd + Enter'
 
   const [hovered, setHovered] = useState(false)
+  const [savedSQL, setSavedSQL] = useState(props.defaultCellData.sql)
   const [inputSQL, setInputSQL] = useState(props.defaultCellData.sql)
   const [result, setResult] = useState<{ fields: string[], data: object[] } | null>(props.defaultCellData.result)
   const [errMessage, setErrMessage] = useState<string | null>(props.defaultCellData.errorMessage)
@@ -28,6 +29,7 @@ export default function Cell(props: CellProps) {
   useEffect(() => {
     // Do not rollback the inputSQL when other cells are updated
     // setInputSQL(props.defaultCellData.sql)
+    setSavedSQL(props.defaultCellData.sql)
     setResult(props.defaultCellData.result)
     setErrMessage(props.defaultCellData.errorMessage)
   }, [props])
@@ -121,6 +123,7 @@ export default function Cell(props: CellProps) {
             [
             {props.index + 1}
             ]
+            {inputSQL === savedSQL ? '' : ' *'}
           </Typography>
           <IconButton
             sx={{
