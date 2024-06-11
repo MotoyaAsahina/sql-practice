@@ -3,7 +3,7 @@ import { Box, IconButton, Typography } from '@mui/material'
 import React, { createContext, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
-import Cell from '@/components/cell'
+import Cell from '@/components/Cell'
 import { CellData, deleteCellData, saveCellData, saveCellIDs } from '@/lib/local_save'
 
 export const CellContext = createContext<{
